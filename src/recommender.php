@@ -101,6 +101,14 @@ class WeddingFinder
             'Renda' => 0.1450974866145632,
             'Filho' => 0.67471612937220166,
             'classificacao' => 'IMPROVAVEL'
+        ),
+        'User 11' => array(
+            'Escolaridade' => 0.5776576491728649,
+            'Etinia' => 0.6047959402892891,
+            'Regiao' => 0.6055689603699992,
+            'Renda' => 0.4250974866145632,
+            'Filho' => 0.36471612937220166,
+            'classificacao' => 'PROVAVEL'
         )
     );
 
@@ -253,8 +261,8 @@ class WeddingFinder
 }
 
 $finder = new WeddingFinder();
-$similarity = $finder->getFeatureSimilarity('User 1', 'User 3');
-$classification = $finder->filter('User 3', 5);
+$similarity = $finder->getFeatureSimilarity('User 1', 'User 10');
+$classification = $finder->filter('User 1', 1);
 
 $similarity = number_format($similarity, 2) * 100;
 echo "Similaridade - {$similarity}%" . PHP_EOL;
