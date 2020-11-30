@@ -113,6 +113,59 @@ class WeddingFinder
     );
 
     /**
+     * Guarda o handler do dataset
+     *
+     * @var resource
+     */
+    protected $dataset;
+
+    /**
+     * Constructor
+     *
+     * @param string $filename
+     */
+    public function __construct($filename)
+    {
+        $this->dataset($filename);
+    }
+
+    /**
+     * Faz a leitura do dataset
+     *
+     * @param string $filename
+     * @return void
+     */
+    protected function dataset($filename)
+    {
+        $this->dataset = fopen($filename, 'r');
+        $header = $this->getDatasetHeader();
+        $this->read($header);
+    }
+
+    /**
+     * Retorna o header do dataset
+     *
+     * @return array
+     */
+    protected function getDatasetHeader()
+    {
+        return fgetcsv($this->dataset, 1000);
+    }
+
+    /**
+     * Read dataset csv
+     *
+     * @param array $header
+     * @return void
+     */
+    protected function read($header)
+    {
+        while ($line = fgetcsv($this->dataset)) {
+            array_push($this->features, array_combine($header, $line));
+        }
+    }
+
+    /**
      * Retorna o score das features dos usuários
      *
      * @param string $firstUser
@@ -123,9 +176,6 @@ class WeddingFinder
     {
         $tuple = array();
         array_map(function($data1, $data2) use (&$tuple) {
-            if (is_string($data1) || is_string($data2)) {
-                return;
-            }
             array_push($tuple, array($data1, $data2));
         }, $this->features[$firstUser], $this->features[$secondUser]);
 
@@ -260,9 +310,9 @@ class WeddingFinder
     }
 }
 
-$finder = new WeddingFinder();
-$similarity = $finder->getFeatureSimilarity('User 1', 'User 10');
-$classification = $finder->filter('User 1', 1);
+$finder = new WeddingFinder('./dataset.csv');
+$similarity = $finder->getFeatureSimilarity('100', '99');
+$classification = $finder->filter('98', 1);
 
 $similarity = number_format($similarity, 2) * 100;
 echo "Similaridade - {$similarity}%" . PHP_EOL;
