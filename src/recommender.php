@@ -17,6 +17,11 @@ class WeddingFinder
     const CLASSE = 'classificacao';
 
     /**
+     * Identificador do usuário filtrado
+     */
+    const USER_FILTERING = 'user_filtering_identifier';
+
+    /**
      * Dataset
      *
      * @var array
@@ -250,6 +255,10 @@ class WeddingFinder
 
         krsort($recommend);
         $user = key($recommend);
+
+        echo '<pre>';
+        var_dump ($user);
+        die();
         return $this->features[$user][self::CLASSE];
     }
 
@@ -265,6 +274,18 @@ class WeddingFinder
         return $this->euclideanSimilarity(
             $this->getFeatures($firstUser, $secondUser)
         );
+    }
+
+    /**
+     * Add um usuário na lista de usuarios do dataset
+     *
+     * @param array $features
+     * @return self
+     */
+    public function addUser(array $features)
+    {
+        $this->features[self::USER_FILTERING] = $features;
+        return $this;
     }
 
     /**
@@ -287,7 +308,6 @@ class WeddingFinder
                     continue;
                 }
 
-                # Calculando o peso e a similaridade entre as avaliações
                 $weight = $similarity * $reviewed[$feature];
 
                 if (isset($recommendations[$feature])) {
@@ -296,7 +316,6 @@ class WeddingFinder
                             $otherUser => $weight
                         );
                     }
-
                     continue;
                 }
 
@@ -312,7 +331,17 @@ class WeddingFinder
 
 $finder = new WeddingFinder('./dataset.csv');
 $similarity = $finder->getFeatureSimilarity('100', '99');
-$classification = $finder->filter('98', 1);
+$classification = $finder
+                    ->addUser(
+                        array(
+                            'Escolaridade' => 0.1374576491728649,
+                            'Etinia' => 0.4047959402892891,
+                            'Regiao' => 0.9055689603699992,
+                            'Renda' => 0.8250974866145632,
+                            'Filho' => 0.46471612937220166,
+                        )
+                    )
+                    ->filter(WeddingFinder::USER_FILTERING, 1);
 
 $similarity = number_format($similarity, 2) * 100;
 echo "Similaridade - {$similarity}%" . PHP_EOL;
