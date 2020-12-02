@@ -8,5 +8,5 @@
 ## Arquitetura do projeto
 ![Arquitetura](arquitetura.png)
 
-## Features
+## Exemplo de resultado
 ![Exemplo](_features_.png)
