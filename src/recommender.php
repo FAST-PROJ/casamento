@@ -6,6 +6,8 @@
  * @since     2020-11-30
 */
 
+require 'features.php';
+
 /**
  * Classe responsável por filtrar o dataset de usuários de casamentos
  */
@@ -22,107 +24,13 @@ class WeddingFinder
     const USER_FILTERING = 'user_filtering_identifier';
 
     /**
-     * Dataset
-     *
-     * @var array
-     */
-    protected $features = array(
-        'User 1' => array(
-            'Escolaridade' => 0.5776576491728649,
-            'Etinia' => 0.6047959402892891,
-            'Regiao' => 0.6055689603699992,
-            'Renda' => 0.4250974866145632,
-            'Filho' => 0.36471612937220166,
-            'classificacao' => 'IMPROVAVEL'
-        ),
-        'User 2' => array(
-            'Escolaridade' => 0.2776576491728649,
-            'Etinia' => 0.8047959402892891,
-            'Regiao' => 0.1055689603699992,
-            'Renda' => 0.6250974866145632,
-            'Filho' => 0.96471612937220166,
-            'classificacao' => 'PROVAVEL'
-        ),
-        'User 3' => array(
-            'Escolaridade' => 0.8776576491728649,
-            'Etinia' => 0.9047959402892891,
-            'Regiao' => 0.5055689603699992,
-            'Renda' => 0.2250974866145632,
-            'Filho' => 0.76471612937220166,
-            'classificacao' => 'IMPROVAVEL'
-        ),
-        'User 4' => array(
-            'Escolaridade' => 0.1776576491728649,
-            'Etinia' => 0.047959402892891,
-            'Regiao' => 0.1055689603699992,
-            'Renda' => 0.1250974866145632,
-            'Filho' => 0.06471612937220166,
-            'classificacao' => 'IMPROVAVEL'
-        ),
-        'User 5' => array(
-            'Escolaridade' => 0.1676576491728649,
-            'Etinia' => 0.3447959402892891,
-            'Regiao' => 0.9755689603699992,
-            'Renda' => 0.03500974866145632,
-            'Filho' => 0.04071612937220166,
-            'classificacao' => 'IMPROVAVEL'
-        ),
-        'User 6' => array(
-            'Escolaridade' => 0.5776576491728649,
-            'Etinia' => 0.7747959402892891,
-            'Regiao' => 0.3555689603699992,
-            'Renda' => 0.5750974866145632,
-            'Filho' => 0.8871612937220166,
-            'classificacao' => 'PROVAVEL'
-        ),
-        'User 7' => array(
-            'Escolaridade' => 0.1176576491728649,
-            'Etinia' => 0.3347959402892891,
-            'Regiao' => 0.9055689603699992,
-            'Renda' => 0.00950974866145632,
-            'Filho' => 0.78471612937220166,
-            'classificacao' => 'IMPROVAVEL'
-        ),
-        'User 8' => array(
-            'Escolaridade' => 0.5676576491728649,
-            'Etinia' => 0.7847959402892891,
-            'Regiao' => 0.9955689603699992,
-            'Renda' => 0.3250974866145632,
-            'Filho' => 0.89471612937220166,
-            'classificacao' => 'PROVAVEL'
-        ),
-        'User 9' => array(
-            'Escolaridade' => 0.1374576491728649,
-            'Etinia' => 0.4047959402892891,
-            'Regiao' => 0.9055689603699992,
-            'Renda' => 0.8250974866145632,
-            'Filho' => 0.46471612937220166,
-            'classificacao' => 'IMPROVAVEL'
-        ),
-        'User 10' => array(
-            'Escolaridade' => 0.0776576491728649,
-            'Etinia' => 0.0947959402892891,
-            'Regiao' => 0.1255689603699992,
-            'Renda' => 0.1450974866145632,
-            'Filho' => 0.67471612937220166,
-            'classificacao' => 'IMPROVAVEL'
-        ),
-        'User 11' => array(
-            'Escolaridade' => 0.5776576491728649,
-            'Etinia' => 0.6047959402892891,
-            'Regiao' => 0.6055689603699992,
-            'Renda' => 0.4250974866145632,
-            'Filho' => 0.36471612937220166,
-            'classificacao' => 'PROVAVEL'
-        )
-    );
-
-    /**
      * Guarda o handler do dataset
      *
      * @var resource
      */
     protected $dataset;
+
+    protected $features;
 
     /**
      * Constructor
@@ -166,7 +74,7 @@ class WeddingFinder
     protected function read($header)
     {
         while ($line = fgetcsv($this->dataset)) {
-            array_push($this->features, array_combine($header, $line));
+            $this->features[] = array_combine($header, $line);
         }
     }
 
@@ -179,7 +87,7 @@ class WeddingFinder
      */
     protected function getFeatures($firstUser, $secondUser)
     {
-        $tuple = array();
+        $tuple = [];
         array_map(function($data1, $data2) use (&$tuple) {
             array_push($tuple, array($data1, $data2));
         }, $this->features[$firstUser], $this->features[$secondUser]);
@@ -195,7 +103,7 @@ class WeddingFinder
      */
     protected function euclideanSimilarity(array $points)
     {
-        $tuple = array();
+        $tuple = [];
         array_map(function($points) use (&$tuple) {
             array_push($tuple, pow($points[0] - $points[1], 2));
         }, $points);
@@ -211,7 +119,7 @@ class WeddingFinder
      */
     protected function calculateUserScores($user, $qtSuggestions)
     {
-        $tuple = array();
+        $tuple = [];
         foreach (array_keys($this->features) as $otherUser) {
             if ($otherUser == $user) {
                 continue;
@@ -219,17 +127,23 @@ class WeddingFinder
 
             array_push(
                 $tuple,
-                array(
+                [
                     $otherUser => $this->getFeatureSimilarity(
                         $user,
                         $otherUser
                     )
-                )
+                ]
             );
         }
 
-        sort($tuple);
-        $tuple = array_reverse($tuple);
+        uasort($tuple, function($first, $second) {
+            if (reset($first) == reset($second)) {
+                return 0;
+            }
+
+            return (reset($first) < reset($second)) ? 1 : -1;
+        });
+
         $tuple = array_slice($tuple, 0, $qtSuggestions);
         return $tuple;
     }
@@ -242,7 +156,7 @@ class WeddingFinder
      */
     protected function getRecommendations(array $recommendations)
     {
-        $recommend = array();
+        $recommend = [];
         array_map(function($recommendations) use (&$recommend) {
             if (!isset($recommend[key($recommendations)])) {
                 $recommend[key($recommendations)] = 1;
@@ -256,10 +170,11 @@ class WeddingFinder
         krsort($recommend);
         $user = key($recommend);
 
-        echo '<pre>';
-        var_dump ($user);
-        die();
-        return $this->features[$user][self::CLASSE];
+        return [
+            'user'     => $user,
+            'features' => $this->features[$user],
+            'class'    => $this->features[$user][self::CLASSE]
+        ];
     }
 
     /**
@@ -312,9 +227,9 @@ class WeddingFinder
 
                 if (isset($recommendations[$feature])) {
                     if ($weight > reset($recommendations[$feature])) {
-                        $recommendations[$feature] = array(
+                        $recommendations[$feature] = [
                             $otherUser => $weight
-                        );
+                        ];
                     }
                     continue;
                 }
@@ -329,21 +244,25 @@ class WeddingFinder
     }
 }
 
-$finder = new WeddingFinder('./dataset.csv');
-$similarity = $finder->getFeatureSimilarity('100', '99');
+$finder = new WeddingFinder('../data/features.csv');
 $classification = $finder
                     ->addUser(
-                        array(
-                            'Escolaridade' => 0.1374576491728649,
-                            'Etinia' => 0.4047959402892891,
-                            'Regiao' => 0.9055689603699992,
-                            'Renda' => 0.8250974866145632,
-                            'Filho' => 0.46471612937220166,
-                        )
+                        [
+                            'Escolaridade' => Features::HIGHSCHOOL,
+                            'Etinia'       => Features::WHITE,
+                            'Regiao'       => Features::NEW_ENGLAND,
+                            'Renda'        => Features::POOR,
+                            'Filho'        => Features::NOKIDS,
+                        ]
                     )
-                    ->filter(WeddingFinder::USER_FILTERING, 1);
+                    ->filter(WeddingFinder::USER_FILTERING, 5);
+
+$similarity = $finder->getFeatureSimilarity(WeddingFinder::USER_FILTERING, $classification['user']);
 
 $similarity = number_format($similarity, 2) * 100;
+echo "Usuário - {$classification['user']}" . PHP_EOL;
+echo "<br>";
 echo "Similaridade - {$similarity}%" . PHP_EOL;
 echo "<br>";
-echo "Classe - {$classification}";
+echo "Classe - {$classification['class']}";
+var_dump($classification['features']);
