@@ -10,3 +10,6 @@
 
 ## Exemplo de resultado
 ![Exemplo](_features_.png)
+
+## Distância euclidiana
+![Exemplo](euclidian.png)
