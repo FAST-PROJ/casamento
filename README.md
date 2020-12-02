@@ -1,4 +1,4 @@
 # casamento
 
-## Arquitetura inicial do projeto
+## Arquitetura do projeto
 ![Arquitetura](arquitetura.png)
