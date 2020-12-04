@@ -29,7 +29,12 @@ class WeddingFinder
      * @var resource
      */
     protected $dataset;
-
+    
+    /**
+     * Guarda as features do usuário a ser pesquisado
+     *
+     * @var array
+     */
     protected $features;
 
     /**
